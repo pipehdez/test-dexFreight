@@ -3,6 +3,7 @@
     "name": "TestDexFreightMobile",
     "slug": "TestDexFreightMobile",
     "version": "1.0.0",
+    "scheme": "testdexfreightmobile",
     "assetBundlePatterns": [
       "**/*"
     ]

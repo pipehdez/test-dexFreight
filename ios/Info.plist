@@ -1,0 +1,14 @@
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>twitterkit-oIrVuc7LI4ljZJewQ0IvOJvMX</string>
+    </array>
+  </dict>
+</array>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>twitter</string>
+    <string>twitterauth</string>
+</array>
