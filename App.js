@@ -27,6 +27,8 @@ RNTwitterSignIn.init(
 ).then(() => console.log("RNTwitterSignIn is ready"));
 
 const App = () => {
+
+  // REducer for state management
   const [state, dispatch] = useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -68,33 +70,23 @@ const App = () => {
       try {
         userToken = await AsyncStorage.getItem("userToken");
         user = await AsyncStorage.getItem("user");
-        console.log("userToken", userToken);
-        console.log("user", user);
       } catch (e) {
-        // Restoring token failed
+        console.log(e);
       }
-
-      // After restoring token, we may need to validate it in production apps
-
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
+      
       dispatch({ type: "RESTORE_TOKEN", token: userToken });
     };
 
     bootstrapAsync();
   }, []);
 
+  // Auth Context for state management
   const authContext = useMemo(
     () => ({
       signIn: async (data) => {
-        // In a production app, we need to send some data (usually username, password) to server and get a token
-        // We will also need to handle errors if sign in failed
-        // After getting token, we need to persist the token using `SecureStore` or any other encrypted storage
-        await AsyncStorage.setItem('userToken', 'dummy-auth-token');
+        await AsyncStorage.setItem('userToken', data.authToken);
         await AsyncStorage.setItem('user', JSON.stringify(data));
-        // In the example, we'll use a dummy token
-        //console.log(data)
-        dispatch({ type: "SIGN_IN", token: "dummy-auth-token", user: data });
+        dispatch({ type: "SIGN_IN", token: data.authToken, user: data });
       },
       signOut: async () => {
 
@@ -102,15 +94,7 @@ const App = () => {
         await AsyncStorage.removeItem('user');
 
         dispatch({ type: "SIGN_OUT" })
-      },
-      signUp: async (data) => {
-        // In a production app, we need to send user data to server and get a token
-        // We will also need to handle errors if sign up failed
-        // After getting token, we need to persist the token using `SecureStore` or any other encrypted storage
-        // In the example, we'll use a dummy token
-
-        dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
-      },
+      }
     }),
     []
   );
@@ -121,8 +105,7 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator>
           {state.isLoading ? (
-            // We haven't finished checking for the token yet
-            <Stack.Screen name="Splash" component={SplashScreen} />
+            <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
           ) : state.userToken == null ? (
             // No token found, user isn't signed in
             <Stack.Screen

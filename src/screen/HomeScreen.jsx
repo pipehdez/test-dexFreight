@@ -25,7 +25,7 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     getUserInfo();
-  }, []);
+  }, [getUserInfo]);
 
   const getUserInfo = async () => {
     let user = await AsyncStorage.getItem("user");

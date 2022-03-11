@@ -351,7 +351,7 @@ DEPENDENCIES:
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  trunk:
+  https://github.com/CocoaPods/Specs.git:
     - boost-for-react-native
     - TwitterCore
     - TwitterKit5
@@ -489,6 +489,6 @@ SPEC CHECKSUMS:
   TwitterKit5: 64095dfefcf39be2355711ef27112d55e340d90e
   Yoga: e6ecf3fa25af9d4c87e94ad7d5d292eedef49749
 
-PODFILE CHECKSUM: 7f20f4501f98c674375a516a508b4b8f26155c9c
+PODFILE CHECKSUM: 22a195779ba0332beef2dfb8a830d399232c394f
 
 COCOAPODS: 1.11.2

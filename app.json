@@ -6,6 +6,9 @@
     "scheme": "testdexfreightmobile",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "bundleIdentifier": "com.TestDexFreightMobile"
+    }
   }
 }

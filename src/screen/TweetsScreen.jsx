@@ -1,24 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-import { AntDesign } from "@expo/vector-icons";
-import { RefreshControl, ActivityIndicator } from "react-native";
-import {
-  Box,
-  Text,
-  FlatList,
-  Heading,
-  HStack,
-  VStack,
-  Spacer,
-  Fab,
-  Icon,
-  Modal,
-  Button,
-  FormControl,
-  Input,
-  Stack,
-  useToast
-} from "native-base";
+import { ActivityIndicator } from "react-native";
+import { Box, Heading, useToast } from "native-base";
+
+import CustomFab from "../components/Fab";
+import CustomModal from "../components/Modal";
+
+import CustomList from "../components/List";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -30,11 +18,11 @@ const TweetsScreen = () => {
 
   useEffect(() => {
     getUserTweets();
-  }, []);
+  }, [getUserTweets]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(false);
-    getUserTweets()
+    getUserTweets();
   }, []);
 
   const toast = useToast();
@@ -59,6 +47,13 @@ const TweetsScreen = () => {
   };
 
   const handleTweet = async () => {
+    if (text === "") {
+      return toast.show({
+        description: "Please enter a tweet",
+        type: "danger",
+      });
+    }
+
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append(
@@ -79,8 +74,8 @@ const TweetsScreen = () => {
 
     fetch("https://api.twitter.com/2/tweets", requestOptions)
       .then((response) => response.text())
-      .then((result) => 
-        console.log(result), 
+      .then(
+        (result) => console.log(result),
         setShowModal(false),
         setText(""),
         getUserTweets(),
@@ -89,82 +84,28 @@ const TweetsScreen = () => {
       .catch((error) => console.log("error", error));
   };
 
-  const renderItem = ({ item }) => {
-    return (
-      <Box
-        borderBottomWidth="1"
-        _dark={{ borderColor: "gray.600" }}
-        backgroundColor="blue.300"
-        borderColor="blue.200"
-        pl="4"
-        pr="5"
-        py="2"
-      >
-        <HStack space={3} justifyContent="space-between">
-          <VStack>
-            <Text _dark={{ color: "warmGray.50" }} color="white" bold>
-              {item.text}
-            </Text>
-          </VStack>
-          <Spacer />
-        </HStack>
-      </Box>
-    );
-  };
-  console.log(text);
   return (
     <Box>
       <Heading fontSize="xl" p="4" pb="3">
-        Tweets
+        Recent Tweets { tweets.length }
       </Heading>
       {refreshing ? <ActivityIndicator /> : null}
-      <FlatList
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        data={tweets}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
-      <Box position="relative" h={100} w="100%">
-        <Fab
-          position="absolute"
-          size="sm"
-          icon={<Icon color="white" as={<AntDesign name="plus" />} size="sm" />}
-          onPress={() => setShowModal(true)}
-        />
-      </Box>
 
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <Modal.Content maxWidth="400px">
-          <Modal.CloseButton />
-          <Modal.Header>New Tweet</Modal.Header>
-          <Modal.Body>
-            <FormControl isRequired isInvalid>
-              <Stack mx={4}>
-                <Input
-                  value={text}
-                  onChangeText={setText}
-                  p={2}
-                  placeholder="What's happening?"
-                />
-              </Stack>
-            </FormControl>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group variant="ghost" space={2} color="amber.100">
-              <Button
-                onPress={() => {
-                  setShowModal(false);
-                }}
-              >
-                CANCEL
-              </Button>
-              <Button onPress={handleTweet} >SEND</Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
+      <CustomList
+        tweets={tweets}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
+      />
+
+      <CustomFab onPress={() => setShowModal(true)} />
+
+      <CustomModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        handleTweet={handleTweet}
+        text={text}
+        setText={setText}
+      />
     </Box>
   );
 };
