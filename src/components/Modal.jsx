@@ -5,23 +5,27 @@ const CustomModal = ({
   setText,
   showModal,
   setShowModal,
-  handleTweet
+  handleTweet,
 }) => {
-  // Callback returns text value
+
+  /* Callback: set text value */
   const handleChange = (text) => {
     setText(text);
   };
 
+  /* Callback: set modeal state */
   const handlePress = () => {
     setShowModal(false);
+    setText("");
   };
 
+  /* Callback: Send tweet */
   const handleSubmit = () => {
     handleTweet();
   };
 
   return (
-    <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+    <Modal isOpen={showModal} onClose={handlePress}>
       <Modal.Content maxWidth="400px">
         <Modal.CloseButton />
         <Modal.Header>New Tweet</Modal.Header>

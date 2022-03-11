@@ -1,46 +1,23 @@
 import React, { useEffect } from "react";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import {
-  Text,
-  Box,
-  Center,
-  Stack,
-  Button,
-  Avatar,
-} from "native-base";
+import { Text, Box, Center, Stack, Button, Avatar } from "native-base";
 
 import { AuthContext } from "../context";
+
+import { getUserInfo } from "../request";
 
 const HomeScreen = ({ navigation }) => {
   const { signOut } = React.useContext(AuthContext);
 
   const [user, setUser] = React.useState(null);
 
+  {/* Logout */}
   const handleLogout = () => {
-    console.log("logout");
     signOut();
   };
 
   useEffect(() => {
-    getUserInfo();
-  }, [getUserInfo]);
-
-  const getUserInfo = async () => {
-    let user = await AsyncStorage.getItem("user");
-    user = JSON.parse(user);
-    fetch(
-      `https://api.twitter.com/2/users?ids=${user.userID}&user.fields=id,name,profile_image_url,username,withheld&expansions=pinned_tweet_id`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer AAAAAAAAAAAAAAAAAAAAABg0aAEAAAAAPwYFG%2F50gD71fc5eGthG7yaJ1N4%3DA7UwijwFaUI3LvK1vUdX1sFUE0Dr5LCv3TWiL9YYTaUKaSplY8`,
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => response.json())
+    getUserInfo()
       .then((data) => {
         Object.values(data.data).map((user) => {
           setUser(user);
@@ -49,7 +26,7 @@ const HomeScreen = ({ navigation }) => {
       .catch((error) => {
         console.log(error);
       });
-  };
+  }, []);
 
   return (
     <Box flex={1} bg="#fff" alignItems="center" p={10}>
@@ -63,8 +40,12 @@ const HomeScreen = ({ navigation }) => {
           AK
         </Avatar>
       </Center>
-      <Text>Name: {user?.name}</Text>
-      <Text>Username: {user?.username}</Text>
+      <Text bold fontSize={15}>
+        Name: {user?.name}
+      </Text>
+      <Text bold fontSize={15}>
+        Username: {user?.username}
+      </Text>
       <Stack
         direction={{
           base: "row",

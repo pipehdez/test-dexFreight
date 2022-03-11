@@ -2,6 +2,8 @@ import { Box, HStack, VStack, Text, Spacer, FlatList } from "native-base";
 import { RefreshControl } from "react-native";
 
 const CustomList = ({ tweets, onRefresh, refreshing }) => {
+  
+  /* Render list item */
   const renderItem = ({ item }) => {
     return (
       <Box
@@ -26,6 +28,7 @@ const CustomList = ({ tweets, onRefresh, refreshing }) => {
   };
 
   return (
+    /* List of tweets */
     <FlatList
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

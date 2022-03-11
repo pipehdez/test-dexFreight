@@ -1,6 +1,6 @@
 import React, { useReducer, useEffect, useMemo, createContext } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NativeBaseProvider } from 'native-base';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NativeBaseProvider } from "native-base";
 
 import HomeScreen from "./src/screen/HomeScreen";
 import TweetsScreen from "./src/screen/TweetsScreen";
@@ -27,8 +27,7 @@ RNTwitterSignIn.init(
 ).then(() => console.log("RNTwitterSignIn is ready"));
 
 const App = () => {
-
-  // REducer for state management
+  /* Reducer for state management */
   const [state, dispatch] = useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -43,14 +42,14 @@ const App = () => {
             ...prevState,
             isSignout: false,
             userToken: action.token,
-            user: action.user
+            user: action.user,
           };
         case "SIGN_OUT":
           return {
             ...prevState,
             isSignout: true,
             userToken: null,
-            user: null
+            user: null,
           };
       }
     },
@@ -58,12 +57,12 @@ const App = () => {
       isLoading: true,
       isSignout: false,
       userToken: null,
-      user: null
+      user: null,
     }
   );
 
   useEffect(() => {
-    // Fetch the token from storage then navigate to our appropriate place
+    /* Fetch the token from storage then navigate to our appropriate place */
     const bootstrapAsync = async () => {
       let userToken;
 
@@ -73,28 +72,30 @@ const App = () => {
       } catch (e) {
         console.log(e);
       }
-      
+
       dispatch({ type: "RESTORE_TOKEN", token: userToken });
     };
 
     bootstrapAsync();
+    return () => { // This code runs when component is unmounted
+      componentMounted.current = false; // (4) set it to false when we leave the page
+  }
   }, []);
 
-  // Auth Context for state management
+  /* Auth Context for state management */
   const authContext = useMemo(
     () => ({
       signIn: async (data) => {
-        await AsyncStorage.setItem('userToken', data.authToken);
-        await AsyncStorage.setItem('user', JSON.stringify(data));
+        await AsyncStorage.setItem("userToken", data.authToken);
+        await AsyncStorage.setItem("user", JSON.stringify(data));
         dispatch({ type: "SIGN_IN", token: data.authToken, user: data });
       },
       signOut: async () => {
+        await AsyncStorage.removeItem("userToken");
+        await AsyncStorage.removeItem("user");
 
-        await AsyncStorage.removeItem('userToken');
-        await AsyncStorage.removeItem('user');
-
-        dispatch({ type: "SIGN_OUT" })
-      }
+        dispatch({ type: "SIGN_OUT" });
+      },
     }),
     []
   );
@@ -102,30 +103,34 @@ const App = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <NativeBaseProvider>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {state.isLoading ? (
-            <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
-          ) : state.userToken == null ? (
-            // No token found, user isn't signed in
-            <Stack.Screen
-              name="SignIn"
-              component={SignInScreen}
-              options={{
-                title: "Sign in",
-                // When logging out, a pop animation feels intuitive
-                animationTypeForReplace: state.isSignout ? "pop" : "push",
-              }}
-            />
-          ) : (
-            // User is signed in
-            <>
-              <Stack.Screen name="Profile" component={HomeScreen} />
-              <Stack.Screen name="Tweets" component={TweetsScreen} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
+        <NavigationContainer>
+          <Stack.Navigator>
+            {state.isLoading ? (
+              <Stack.Screen
+                name="Splash"
+                component={SplashScreen}
+                options={{ headerShown: false }}
+              />
+            ) : state.userToken == null ? (
+              // No token found, user isn't signed in
+              <Stack.Screen
+                name="SignIn"
+                component={SignInScreen}
+                options={{
+                  title: "Sign in",
+                  /* When logging out, a pop animation feels intuitive */
+                  animationTypeForReplace: state.isSignout ? "pop" : "push",
+                }}
+              />
+            ) : (
+              /* User is signed in */
+              <>
+                <Stack.Screen name="Profile" component={HomeScreen} />
+                <Stack.Screen name="Tweets" component={TweetsScreen} />
+              </>
+            )}
+          </Stack.Navigator>
+        </NavigationContainer>
       </NativeBaseProvider>
     </AuthContext.Provider>
   );

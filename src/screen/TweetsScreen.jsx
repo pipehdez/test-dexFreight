@@ -8,7 +8,7 @@ import CustomModal from "../components/Modal";
 
 import CustomList from "../components/List";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUserTweets, sendTweet } from "../request";
 
 const TweetsScreen = () => {
   const [tweets, setTweets] = useState([]);
@@ -17,27 +17,17 @@ const TweetsScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    getUserTweets();
-  }, [getUserTweets]);
+    getTweets();
+  }, []);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(false);
-    getUserTweets();
+    getTweets();
   }, []);
 
-  const toast = useToast();
-
-  const getUserTweets = async () => {
-    let user = await AsyncStorage.getItem("user");
-    user = JSON.parse(user);
-    fetch(`https://api.twitter.com/2/users/${user.userID}/tweets`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer AAAAAAAAAAAAAAAAAAAAABg0aAEAAAAAPwYFG%2F50gD71fc5eGthG7yaJ1N4%3DA7UwijwFaUI3LvK1vUdX1sFUE0Dr5LCv3TWiL9YYTaUKaSplY8`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
+  {/* Get user tweets */}
+  const getTweets = () => {
+    getUserTweets()
       .then((data) => {
         setTweets(data.data);
       })
@@ -46,7 +36,13 @@ const TweetsScreen = () => {
       });
   };
 
+  {/* Message toasts */}
+  const toast = useToast();
+
+  {/* Send tweet */}
   const handleTweet = async () => {
+
+    {/* Validate input of tweet */}
     if (text === "") {
       return toast.show({
         description: "Please enter a tweet",
@@ -54,31 +50,12 @@ const TweetsScreen = () => {
       });
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append(
-      "Authorization",
-      'OAuth oauth_consumer_key="hHa9BYwPBZU4gbrBqOx5Q4bfK",oauth_token="1501630349436239880-YwVdZHoiMGHMFrGpY7lE3dvOIiJfRh",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1646938988",oauth_nonce="X0LzymGtRpb",oauth_version="1.0",oauth_signature="E1z3CR8aaiyQdl5YSzFXUaQLo6o%3D"'
-    );
-
-    let raw = JSON.stringify({
-      text: text,
-    });
-
-    let requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    fetch("https://api.twitter.com/2/tweets", requestOptions)
-      .then((response) => response.text())
+    sendTweet(text)
       .then(
         (result) => console.log(result),
         setShowModal(false),
         setText(""),
-        getUserTweets(),
+        getTweets(),
         toast.show({ description: "Tweet sent successfully" })
       )
       .catch((error) => console.log("error", error));
@@ -87,10 +64,11 @@ const TweetsScreen = () => {
   return (
     <Box>
       <Heading fontSize="xl" p="4" pb="3">
-        Recent Tweets { tweets.length }
+        Recent Tweets {tweets.length}
       </Heading>
       {refreshing ? <ActivityIndicator /> : null}
 
+      {/* Swipe down to refresh the list of tweets */}
       <CustomList
         tweets={tweets}
         onRefresh={onRefresh}
@@ -99,6 +77,7 @@ const TweetsScreen = () => {
 
       <CustomFab onPress={() => setShowModal(true)} />
 
+      {/* Modal to send a tweet */}
       <CustomModal
         showModal={showModal}
         setShowModal={setShowModal}

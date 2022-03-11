@@ -1,12 +1,12 @@
 import { AntDesign } from "@expo/vector-icons";
-import { Box, Fab, Icon } from "native-base";
+import { Box, Fab, Icon } from "native-base";
 
 const CustomFab = ({ onPress }) => {
 
-    // callback returns a onPress function
-    const handlePress = () => {
-        onPress();
-    };
+  /* Callback: return a function onPress */
+  const handlePress = () => {
+    onPress();
+  };
 
   return (
     <Box position="relative" h={100} w="100%">
