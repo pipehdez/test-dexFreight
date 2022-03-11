@@ -9,6 +9,9 @@
     ],
     "ios": {
       "bundleIdentifier": "com.TestDexFreightMobile"
+    },
+    "android": {
+      "package": "com.TestDexFreightMobile"
     }
   }
 }
